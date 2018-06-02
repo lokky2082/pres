@@ -1,0 +1,12 @@
+{
+  "slides": {
+    "1":{
+      "name": "test1",
+      "active": false
+    },
+    "2":{
+      "name": "test2",
+      "active": false
+    }
+  }
+}
