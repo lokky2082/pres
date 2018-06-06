@@ -17,11 +17,13 @@
                width="100%" 
                v-for="(item, key, i) in menu" 
                v-if="item.active" :key="'slide' + i" >
+               <!---->
                 <v-card-title>
                   <h2 class="display-2 mb-5">{{item.name}}</h2>
                 </v-card-title>
                  <v-card-text>
                    <div class="card-inner">
+                     <Cionfeti v-if="i===8"/>
                       <div class="card-list" v-if="lists">
                             <v-card class="mb-4 list-card" row v-for="(item, i) in lists[key]" 
                             :key="'list'+i"  @click.native="updateList(key, i)">
@@ -34,24 +36,30 @@
                             </v-card>
                       </div>
                       <div v-if="imgs">
-                        <div class="card-img" v-for="(item, n) in imgs[key]" :key="'img'+n" v-if="item.seen">
-                          <v-stack v-if="i === 5 && n === 0 "></v-stack>                      
-                          <img v-else :src="item.img">
+                      <template>
+                         <div class="card-img" v-for="(item, n) in imgs[key]" :key="'img'+n " v-if="item.seen">
+                          <v-stack v-if="i === 5 && n === 0 "></v-stack>
+                          <img  v-else :src="item.img">                   
                         </div>
-                        <div class="robots-wrap" >
-                            <v-robots></v-robots>
-                        </div>
+                      </template>
+                     
                       </div>
+                      <template>
+                        <div class="robots-wrap" v-for="(item, n) in imgs[key]" :key="'img'+n " v-if="(i === 8 && n === 0) || i === 2 && n === 0">
+                          <v-robots></v-robots>
+                        </div>   
+                      </template>
+                     
 
                    </div>
                  </v-card-text>
                  <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn v-if="i < slidesLength-1" @click.native="updateSlides(key, 'next', i)">
-                     Вперед
-                    </v-btn>
                     <v-btn v-if="i > 0" @click.native="updateSlides(key, 'prev', i)">
                       Назад
+                    </v-btn>
+                     <v-btn v-if="i < slidesLength-1" @click.native="updateSlides(key, 'next', i)">
+                     Вперед
                     </v-btn>
                     <v-spacer></v-spacer>
                   </v-card-actions>
@@ -64,12 +72,14 @@
 <script>
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue';
+import Cionfeti from '@/components/Cionfeti.vue';
 import firebase from 'firebase';
 import { mapActions, mapState } from 'vuex'
 export default {
   name: 'home',
   components: {
     HelloWorld,
+    Cionfeti
   },
   data() {
     return {
@@ -115,15 +125,19 @@ export default {
       const listItemTrue = {
         icon: true
       }
-      console.log('img',this.imgs[key][i]);
-      console.log('list', this.lists[key][i]);
-      var updates = {};
-      updates['/lists/' + key +'/'+ i] =  Object.assign(this.lists[key][i], listItemTrue);
-      if (i>0) {
-        updates['/imgs/' + key +'/'+ n] =  Object.assign(this.imgs[key][n], imageFalse);
+      this.imgs[key].forEach((element, k) => {
+        if (k === i) {
+          element = Object.assign(element, imageTrue);
+        } else {
+          element = Object.assign(element, imageFalse);
+        }
+      });
+      if (this.user.auth) {
+          var updates = {};
+          updates['/lists/' + key +'/'+ i] =  Object.assign(this.lists[key][i], listItemTrue);
+          updates['/imgs/' + key] =  this.imgs[key];
+          firebase.database().ref().update(updates);
       }
-      updates['/imgs/' + key +'/'+ i] =  Object.assign(this.imgs[key][i], imageTrue);
-      firebase.database().ref().update(updates);
     },
     updateSlides(key, way, i) {
       if (way === 'next') {
@@ -136,10 +150,15 @@ export default {
           active: true,
           seen: false,
         };
-        const updates = {};
-        updates[key] = Object.assign(this.menu[key], postDataDeactive);
-        updates[next] = Object.assign(this.menu[next], postDataActive);
-        firebase.database().ref('slider').update(updates);
+        if (this.user.auth){
+          const updates = {};
+          updates[key] = Object.assign(this.menu[key], postDataDeactive);
+          updates[next] = Object.assign(this.menu[next], postDataActive);
+          firebase.database().ref('slider').update(updates);
+        } else {
+          this.menu[key] = Object.assign(this.menu[key], postDataDeactive);
+          this.menu[next] = Object.assign(this.menu[next], postDataActive);
+        }
       } else if (way === 'prev') {
         const next = Object.keys(this.menu)[i - 1];
         const postDataDeactive = {
@@ -150,10 +169,15 @@ export default {
           active: true,
           seen: false,
         };
-        const updates = {};
-        updates[key] = Object.assign(this.menu[key], postDataDeactive);
-        updates[next] = Object.assign(this.menu[next], postDataActive);
-        firebase.database().ref('slider').update(updates);
+       if (this.user.auth){
+          const updates = {};
+          updates[key] = Object.assign(this.menu[key], postDataDeactive);
+          updates[next] = Object.assign(this.menu[next], postDataActive);
+          firebase.database().ref('slider').update(updates);
+        } else {
+          this.menu[key] = Object.assign(this.menu[key], postDataDeactive);
+          this.menu[next] = Object.assign(this.menu[next], postDataActive);
+        }
       }
       console.log('update');
     },
@@ -163,7 +187,7 @@ export default {
 <style scoped lang="scss">
   .robots-wrap{
     position: relative;
-    height: 400px;
+    height: 450px;
     width: 100%;
     grid-column: 1/3;
   }
@@ -213,6 +237,7 @@ export default {
    grid-template-columns: 1fr;
    grid-template-rows: 150px 1fr;
    height: calc(100vh - 68px);
+   position: relative;
  }
  .card-ico-row {
    display: grid;
@@ -221,7 +246,6 @@ export default {
    text-align: left;
  }
  .card-list {
-   align-self: center;
  }
  .list-card {
    cursor: pointer;
@@ -233,9 +257,8 @@ export default {
    position: relative;
    img {
     max-width: 80%;
-   margin-top: -5%;
    display: block;
-   margin: -5% auto 0 auto;
+   margin: 0 auto;
    max-height: 400px;
    }
  }

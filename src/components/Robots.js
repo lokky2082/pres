@@ -206,7 +206,7 @@ function startRobots(){
     // ---- set canvas ----
     const canvas = {
         init() {
-            this.elem = document.querySelector("canvas");
+            this.elem = document.querySelector("canvas#robots");
             this.resize();
             window.addEventListener("resize", () => this.resize(), false);
             return this.elem.getContext("2d");

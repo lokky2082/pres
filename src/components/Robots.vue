@@ -1,5 +1,5 @@
 <template>
-    <canvas></canvas>
+    <canvas id="robots"></canvas>
 </template>
 
 <script>
