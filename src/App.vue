@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-app >
+    <v-app >      
       <div class="btn-holder">
         <v-btn color="info" @click="auth=true">Контроль</v-btn>
       </div>

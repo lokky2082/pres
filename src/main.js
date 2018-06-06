@@ -6,6 +6,7 @@ import 'vuetify/dist/vuetify.min.css';
 import App from './App.vue';
 import router from './router';
 import store from './store';
+import VStack from './components/Stack'
 
 
 Vue.config.productionTip = false;
@@ -25,6 +26,9 @@ firebase.database().ref('slides').on('value', (snapshot) => {
   const test = snapshot.val();
   console.log(test);
 });
+
+Vue.component("v-stack",VStack)
+
 new Vue({
   router,
   store,
