@@ -34,11 +34,15 @@
                             </v-card>
                       </div>
                       <div v-if="imgs">
-                      <div class="card-img" v-for="(item, n) in imgs[key]" :key="'img'+n" v-if="item.seen">
-                        <v-stack v-if="i === 5 && n === 0 "></v-stack>                      
-                        <img v-else :src="item.img">
+                        <div class="card-img" v-for="(item, n) in imgs[key]" :key="'img'+n" v-if="item.seen">
+                          <v-stack v-if="i === 5 && n === 0 "></v-stack>                      
+                          <img v-else :src="item.img">
+                        </div>
+                        <div class="robots-wrap" >
+                            <v-robots></v-robots>
                         </div>
                       </div>
+
                    </div>
                  </v-card-text>
                  <v-card-actions>
@@ -157,6 +161,12 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+  .robots-wrap{
+    position: relative;
+    height: 400px;
+    width: 100%;
+    grid-column: 1/3;
+  }
  .test {
    & div {
      width: 200px;
