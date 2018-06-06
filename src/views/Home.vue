@@ -33,31 +33,24 @@
                                 </v-card-title>
                             </v-card>
                       </div>
-                      <div  v-if="imgs">
-                        <div class="card-img" v-for="(item, i) in imgs[key]" :key="'img'+i" v-if="item.seen">
-                            <img :src="item.img">
+                      <div v-if="imgs">
+                      <div class="card-img" v-for="(item, n) in imgs[key]" :key="'img'+n" v-if="item.seen">
+                        <v-stack v-if="i === 5 && n === 0 "></v-stack>                      
+                        <img v-else :src="item.img">
                         </div>
                       </div>
                    </div>
                  </v-card-text>
-                 <v-card-actions v-if="user.auth">
+                 <v-card-actions>
                     <v-spacer></v-spacer>
+                    <v-btn v-if="i < slidesLength-1" @click.native="updateSlides(key, 'next', i)">
+                     Вперед
+                    </v-btn>
                     <v-btn v-if="i > 0" @click.native="updateSlides(key, 'prev', i)">
                       Назад
                     </v-btn>
-                     <v-btn v-if="i < slidesLength-1" @click.native="updateSlides(key, 'next', i)">
-                     Вперед
-                    </v-btn>
                     <v-spacer></v-spacer>
                   </v-card-actions>
-                   <v-card-actions v-if="!user.auth">
-                    <v-btn v-if="i > 0" @click.native="updateLocalySlides(key, 'prev', i)">
-                      Назад
-                    </v-btn>
-                     <v-btn v-if="i < slidesLength-1" @click.native="updateLocalySlides(key, 'next', i)">
-                     Вперед
-                    </v-btn>
-                   </v-card-actions>
               </v-card>
            </v-layout>
         </v-container>
@@ -107,6 +100,7 @@ export default {
   methods: {
     ...mapActions(['getSlides']),
     updateList(key, i) {
+      console.log(key, i)
       const n = i - 1;
       const imageFalse = {
         seen:false
@@ -117,29 +111,15 @@ export default {
       const listItemTrue = {
         icon: true
       }
-      if (this.user.auth) {
-          var updates = {};
-          updates['/lists/' + key +'/'+ i] =  Object.assign(this.lists[key][i], listItemTrue);
-          this.imgs[key].forEach((element, k) => {
-            if (k===i) {
-              element = Object.assign(element, imageTrue)
-            } else {
-              element = Object.assign(element, imageFalse)
-            }
-          })
-          updates['/imgs/' + key] =  this.imgs[key]
-          firebase.database().ref().update(updates);
-      } else {
-        this.lists[key][i] =  Object.assign(this.lists[key][i], listItemTrue);
-         this.imgs[key].forEach((element, k) => {
-            if (k===i) {
-              element = Object.assign(element, imageTrue)
-            } else {
-              element = Object.assign(element, imageFalse)
-            }
-          })
+      console.log('img',this.imgs[key][i]);
+      console.log('list', this.lists[key][i]);
+      var updates = {};
+      updates['/lists/' + key +'/'+ i] =  Object.assign(this.lists[key][i], listItemTrue);
+      if (i>0) {
+        updates['/imgs/' + key +'/'+ n] =  Object.assign(this.imgs[key][n], imageFalse);
       }
-     
+      updates['/imgs/' + key +'/'+ i] =  Object.assign(this.imgs[key][i], imageTrue);
+      firebase.database().ref().update(updates);
     },
     updateSlides(key, way, i) {
       if (way === 'next') {
@@ -173,35 +153,6 @@ export default {
       }
       console.log('update');
     },
-    updateLocalySlides(key, way, i) {
-      if (way === 'next') {
-        const next = Object.keys(this.menu)[i + 1];
-        const postDataDeactive = {
-          active: false,
-          seen: true,
-        };
-        const postDataActive = {
-          active: true,
-          seen: false,
-        };
-        const updates = {};
-        this.menu[key] = Object.assign(this.menu[key], postDataDeactive);
-        this.menu[next] = Object.assign(this.menu[next], postDataActive);
-      } else if (way === 'prev') {
-        const next = Object.keys(this.menu)[i - 1];
-        const postDataDeactive = {
-          active: false,
-          seen: false,
-        };
-        const postDataActive = {
-          active: true,
-          seen: false,
-        };
-        this.menu[key]= Object.assign(this.menu[key], postDataDeactive);
-        this.menu[next]= Object.assign(this.menu[next], postDataActive);
-      }
-      console.log('update');
-    }
   },
 };
 </script>
