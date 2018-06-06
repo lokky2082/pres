@@ -44,6 +44,13 @@
                       </template>
                      
                       </div>
+                      <template>
+                        <div class="robots-wrap" v-for="(item, n) in imgs[key]" :key="'img'+n " v-if="(i === 8 && n === 0) || i === 2 && n === 0">
+                          <v-robots></v-robots>
+                        </div>   
+                      </template>
+                     
+
                    </div>
                  </v-card-text>
                  <v-card-actions>
@@ -178,6 +185,12 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+  .robots-wrap{
+    position: relative;
+    height: 450px;
+    width: 100%;
+    grid-column: 1/3;
+  }
  .test {
    & div {
      width: 200px;

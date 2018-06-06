@@ -7,6 +7,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import VStack from './components/Stack'
+import VRobots from './components/Robots'
 
 
 Vue.config.productionTip = false;
@@ -28,6 +29,7 @@ firebase.database().ref('slides').on('value', (snapshot) => {
 });
 
 Vue.component("v-stack",VStack)
+Vue.component("v-robots",VRobots)
 
 new Vue({
   router,
